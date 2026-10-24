@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="template" xml:space="preserve">
+    <t t-name="ws_apps_dashboard_search.SearchBar">
+        <div class="ws_apps_dashboard_search_wrapper">
+            <label class="ws_apps_dashboard_search" aria-label="Search apps">
+                <span class="ws_apps_dashboard_search_icon" aria-hidden="true">🔎</span>
+                <input
+                    type="text"
+                    class="ws_apps_dashboard_search_input"
+                    placeholder="Search apps..."
+                    aria-label="Search apps"
+                />
+                <button type="button" class="ws_apps_dashboard_search_clear" aria-label="Clear search">
+                    ×
+                </button>
+            </label>
+        </div>
+    </t>
+</templates>

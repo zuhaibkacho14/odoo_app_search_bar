@@ -1,0 +1,179 @@
+const APP_SEARCH_ID = 'ws_apps_dashboard_search_wrapper';
+
+function normalizeText(value) {
+    return (value || '').replace(/\s+/g, ' ').trim().toLowerCase();
+}
+
+function getAppMenuContainer() {
+    return (
+        document.querySelector('.o_navbar_apps_menu .o-dropdown--menu') ||
+        document.querySelector('.o_navbar_apps_menu .dropdown-menu') ||
+        document.querySelector('.o_navbar_apps_menu .o_dropdown_menu') ||
+        document.querySelector('.o_app_menu') ||
+        document.querySelector('.o_main_navbar .o-dropdown--menu') ||
+        document.querySelector('.o_apps_menu') ||
+        document.querySelector('.o_menu_apps')
+    );
+}
+
+function isAppMenuItem(item) {
+    if (!item || !(item instanceof HTMLElement)) {
+        return false;
+    }
+    const hasAppMarker =
+        item.dataset.menuXmlid ||
+        item.dataset.menuId ||
+        item.classList.contains('o_app') ||
+        item.classList.contains('o-dropdown-item') ||
+        item.classList.contains('dropdown-item');
+    if (!hasAppMarker) {
+        return false;
+    }
+    const text = normalizeText(item.textContent || '');
+    return text.length > 0;
+}
+
+function getAppItems(container) {
+    return Array.from(container.querySelectorAll('.o-dropdown-item, .dropdown-item, .o_app, .o_menu_item')).filter(
+        (item) => isAppMenuItem(item)
+    );
+}
+
+function getEmptyState() {
+    const empty = document.createElement('div');
+    empty.className = 'ws_apps_dashboard_search_empty';
+    empty.textContent = 'No apps found';
+    return empty;
+}
+
+function filterApps(query) {
+    const container = getAppMenuContainer();
+    if (!container) {
+        return;
+    }
+
+    const items = getAppItems(container);
+    let visibleCount = 0;
+    const normalizedQuery = normalizeText(query);
+
+    items.forEach((item) => {
+        const label = normalizeText(item.textContent || item.getAttribute('title') || '');
+        const match = !normalizedQuery || label.includes(normalizedQuery);
+        item.style.display = match ? '' : 'none';
+        if (match) {
+            visibleCount += 1;
+        }
+    });
+
+    let emptyState = container.querySelector('.ws_apps_dashboard_search_empty');
+    if (!emptyState) {
+        emptyState = getEmptyState();
+    }
+
+    if (normalizedQuery && visibleCount === 0) {
+        container.appendChild(emptyState);
+    } else {
+        emptyState.remove();
+    }
+}
+
+function createSearchBar() {
+    const wrapper = document.createElement('div');
+    wrapper.className = 'ws_apps_dashboard_search_wrapper';
+    wrapper.id = APP_SEARCH_ID;
+    wrapper.innerHTML = `
+        <label class="ws_apps_dashboard_search" aria-label="Search apps">
+            <span class="ws_apps_dashboard_search_icon" aria-hidden="true">🔎</span>
+            <input
+                class="ws_apps_dashboard_search_input"
+                type="text"
+                placeholder="Search apps..."
+                aria-label="Search apps"
+            />
+            <button type="button" class="ws_apps_dashboard_search_clear" aria-label="Clear search">×</button>
+        </label>
+    `;
+
+    const input = wrapper.querySelector('input');
+    const clear = wrapper.querySelector('button');
+
+    input.addEventListener('input', (event) => {
+        const query = event.target.value || '';
+        filterApps(query);
+        clear.style.visibility = query.trim() ? 'visible' : 'hidden';
+    });
+
+    clear.addEventListener('click', () => {
+        input.value = '';
+        filterApps('');
+        clear.style.visibility = 'hidden';
+        input.focus();
+    });
+
+    clear.style.visibility = 'hidden';
+    return wrapper;
+}
+
+function ensureSearchBar() {
+    const container = getAppMenuContainer();
+    if (!container) {
+        return;
+    }
+
+    if (container.querySelector('.ws_apps_dashboard_search_wrapper')) {
+        return;
+    }
+
+    const searchBar = createSearchBar();
+    const firstVisibleItem = Array.from(container.children).find((node) => {
+        if (!(node instanceof HTMLElement)) {
+            return false;
+        }
+        return isAppMenuItem(node);
+    });
+
+    if (firstVisibleItem) {
+        container.insertBefore(searchBar, firstVisibleItem);
+    } else {
+        container.prepend(searchBar);
+    }
+
+    filterApps('');
+}
+
+function setupAppSearchObserver() {
+    if (document.body.dataset.wsAppsDashboardSearchObserver === 'true') {
+        return;
+    }
+    document.body.dataset.wsAppsDashboardSearchObserver = 'true';
+
+    const observer = new MutationObserver(() => {
+        ensureSearchBar();
+    });
+
+    observer.observe(document.body, {
+        childList: true,
+        subtree: true,
+    });
+}
+
+if (typeof window !== 'undefined') {
+    setupAppSearchObserver();
+    window.addEventListener('load', () => {
+        ensureSearchBar();
+        filterApps('');
+    });
+    document.addEventListener('click', (event) => {
+        const target = event.target;
+        if (!(target instanceof HTMLElement)) {
+            return;
+        }
+
+        if (target.closest('.o_navbar_apps_menu') || target.closest('.o_menu_toggle')) {
+            setTimeout(() => {
+                ensureSearchBar();
+                filterApps('');
+            }, 50);
+        }
+    });
+}
