@@ -1,73 +1,31 @@
-.ws_apps_dashboard_search_wrapper {
-    position: sticky;
-    top: 0;
-    z-index: 10;
-    padding: 8px 10px 6px;
-    background: rgba(255, 255, 255, 0.96);
-    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
-}
+# Odoo App Search Bar
 
-.ws_apps_dashboard_search {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    min-height: 38px;
-    padding: 0 10px;
-    background: #f5f6f7;
-    border: 1px solid rgba(0, 0, 0, 0.12);
-    border-radius: 8px;
-    box-sizing: border-box;
-}
+A lightweight Odoo module that adds a live search box inside the dashboard/app menu so users can quickly find apps without scrolling.
 
-.ws_apps_dashboard_search:focus-within {
-    border-color: #2f7cf6;
-    box-shadow: 0 0 0 2px rgba(47, 124, 246, 0.12);
-}
+## Features
 
-.ws_apps_dashboard_search_icon {
-    font-size: 14px;
-    color: rgba(0, 0, 0, 0.5);
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-}
+- Live filtering of visible apps
+- Search input above the app list
+- Clear-button support
+- No-result message when there are no matches
+- Works with standard app menu items
 
-.ws_apps_dashboard_search_input {
-    flex: 1 1 auto;
-    min-width: 0;
-    border: none;
-    background: transparent;
-    outline: none;
-    font-size: 14px;
-    color: #2f3136;
-    box-shadow: none;
-}
+## Module structure
 
-.ws_apps_dashboard_search_input::placeholder {
-    color: rgba(0, 0, 0, 0.45);
-}
+- `ws_apps_dashboard_search/__init__.py`
+- `ws_apps_dashboard_search/__manifest__.py`
+- `ws_apps_dashboard_search/static/src/js/apps_dashboard_search.js`
+- `ws_apps_dashboard_search/static/src/xml/apps_dashboard_search.xml`
+- `ws_apps_dashboard_search/static/src/scss/apps_dashboard_search.scss`
 
-.ws_apps_dashboard_search_clear {
-    border: none;
-    background: rgba(0, 0, 0, 0.06);
-    color: rgba(0, 0, 0, 0.7);
-    border-radius: 50%;
-    width: 22px;
-    height: 22px;
-    padding: 0;
-    cursor: pointer;
-    font-size: 16px;
-    line-height: 1;
-}
+## Installation
 
-.ws_apps_dashboard_search_empty {
-    padding: 16px 12px;
-    color: rgba(0, 0, 0, 0.6);
-    text-align: center;
-    font-size: 14px;
-    border-top: 1px solid rgba(0, 0, 0, 0.06);
-}
+1. Copy the `ws_apps_dashboard_search` folder into your Odoo addons path.
+2. Restart Odoo.
+3. Update the module list.
+4. Install `Apps Dashboard Search`.
+5. Open the app menu and type in the search field.
 
-.ws_apps_dashboard_search_wrapper + .ws_apps_dashboard_search_empty {
-    margin-top: 0;
-}
+## Notes
+
+This is a frontend enhancement for the app menu; exact selectors may vary depending on the Odoo version and customizations in your environment.
